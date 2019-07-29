@@ -4,6 +4,7 @@
  * 中国传媒大学/数字电视技术
  * Communication University of China / Digital TV Technology
  * http://blog.csdn.net/leixiaohua1020
+ * https://github.com/leixiaohua1020/simplest_ffmpeg_mobile/blob/master/simplest_ffmpeg_android_helloworld/jni/simplest_ffmpeg_helloworld.c
  *
  *
  * 它可以打印出FFmpeg类库的下列信息：
@@ -20,6 +21,7 @@
 #include "libavformat/avformat.h"
 #include "libavfilter/avfilter.h"
 
+char info[40000]={0};
 
 //FIX
 struct URLProtocol;
@@ -28,7 +30,8 @@ struct URLProtocol;
  * Protocol Support Information
  */
 char *urlprotocolinfo() {
-    char info[40000]={0};
+    memset(info, 0x00, sizeof(info));
+
     av_register_all();
 
     struct URLProtocol *pup = NULL;
@@ -54,7 +57,7 @@ char *urlprotocolinfo() {
  * AVFormat Support Information
  */
 char *avformatinfo(){
-    char info[40000] = { 0 };
+    memset(info, 0x00, sizeof(info));
 
     av_register_all();
 
@@ -81,7 +84,7 @@ char *avformatinfo(){
  */
 char *avcodecinfo()
 {
-    char info[40000] = { 0 };
+    memset(info, 0x00, sizeof(info));
 
     av_register_all();
 
@@ -120,13 +123,13 @@ char *avcodecinfo()
  */
 char *avfilterinfo()
 {
-    char info[40000] = { 0 };
+    memset(info, 0x00, sizeof(info));
     avfilter_register_all();
     AVFilter *f_temp = (AVFilter *)avfilter_next(NULL);
     while (f_temp != NULL){
         sprintf(info, "%s[%10s]\n", info, f_temp->name);
+        f_temp = (AVFilter *)avfilter_next(f_temp);  // 此处修改了雷神的一些小错误
     }
-
 
     return info;
 }
@@ -136,7 +139,7 @@ char *avfilterinfo()
  */
 char *configurationinfo()
 {
-    char info[10000] = { 0 };
+    memset(info, 0x00, sizeof(info));
     av_register_all();
 
     sprintf(info, "%s\n", avcodec_configuration());
@@ -147,11 +150,20 @@ char *configurationinfo()
 
 int main(int argc, char* argv[])
 {
-	urlprotocolinfo();
-	avformatinfo();
-	avcodecinfo();
-	avfilterinfo();
-	configurationinfo();
+    printf("-----------------------------------------------FFmpeg类库支持的协议\n");
+	printf("%s\n", urlprotocolinfo());
+
+    printf("-----------------------------------------------FFmpeg类库支持的封装格式\n");
+    printf("%s\n", avformatinfo());
+
+    printf("-----------------------------------------------FFmpeg类库支持的编解码器\n");
+    printf("%s\n", avcodecinfo());
+
+    printf("-----------------------------------------------FFmpeg类库支持的滤镜\n");
+    printf("%s\n", avfilterinfo());
+
+    printf("-----------------------------------------------FFmpeg类库的配置信息\n");
+    printf("%s\n", configurationinfo());
 	return 0;
 }
 
